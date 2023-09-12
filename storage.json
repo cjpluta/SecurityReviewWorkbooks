@@ -1,0 +1,65 @@
+{
+  "version": "Notebook/1.0",
+  "items": [
+    {
+      "type": 12,
+      "content": {
+        "version": "NotebookGroup/1.0",
+        "groupType": "editable",
+        "title": "Storage",
+        "items": [
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "resources\r\n| extend type == \"microsoft.storage/storageaccounts\"\r\n| where properties['networkAcls']['defaultAction'] == \"Allow\"\r\n| project id, resourceGroup, kind, location, subscriptionId",
+              "size": 4,
+              "title": "Storage Accounts on the Internet",
+              "queryType": 1,
+              "resourceType": "microsoft.resourcegraph/resources",
+              "crossComponentResources": [
+                "value::selected"
+              ]
+            },
+            "name": "query - 1"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "resources\r\n| where type == \"microsoft.storage/storageaccounts\"\r\n| where properties['allowSharedKeyAccess'] == \"true\"\r\n| project id, resourceGroup, kind, location, subscriptionId",
+              "size": 4,
+              "title": "Storage Accounts with Keys Enabled",
+              "queryType": 1,
+              "resourceType": "microsoft.resourcegraph/resources",
+              "crossComponentResources": [
+                "value::selected"
+              ]
+            },
+            "name": "query - 0"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "resources\r\n| where type =~ 'Microsoft.Storage/storageAccounts'\r\n| extend allowBlobPublicAccess = parse_json(properties).allowBlobPublicAccess\r\n| project id, resourceGroup, allowBlobPublicAccess, subscriptionId",
+              "size": 4,
+              "title": "Storage Accounts with Blob Public Access",
+              "queryType": 1,
+              "resourceType": "microsoft.resourcegraph/resources",
+              "crossComponentResources": [
+                "value::selected"
+              ]
+            },
+            "name": "query - 2"
+          }
+        ]
+      },
+      "name": "group - 0"
+    }
+  ],
+  "fallbackResourceIds": [
+    "Azure Monitor"
+  ],
+  "$schema": "https://github.com/Microsoft/Application-Insights-Workbooks/blob/master/schema/workbook.json"
+}
