@@ -1,0 +1,80 @@
+{
+  "version": "Notebook/1.0",
+  "items": [
+    {
+      "type": 12,
+      "content": {
+        "version": "NotebookGroup/1.0",
+        "groupType": "editable",
+        "title": "SQL Servers and Databases",
+        "items": [
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "securityresources\r\n        | where type == \"microsoft.security/assessments\"\r\n        | extend source = trim(' ', tolower(tostring(properties.resourceDetails.Source)))\r\n                                          | extend resourceId = trim(' ', tolower(tostring(case(\r\n                                                                                    source =~ \"azure\", properties.resourceDetails.Id,\r\n                                                                                    source =~ \"aws\" and isnotempty(tostring(properties.resourceDetails.ConnectorId)), properties.resourceDetails.Id,\r\n                                                                                    source =~ \"gcp\" and isnotempty(tostring(properties.resourceDetails.ConnectorId)), properties.resourceDetails.Id,\r\n                                                                                    source =~ 'aws', properties.resourceDetails.AzureResourceId,\r\n                                                                                    source =~ 'gcp', properties.resourceDetails.AzureResourceId,\r\n                                                                                    extract('^(.+)/providers/Microsoft.Security/assessments/.+$',1,id)\r\n                                                                                    ))))\r\n        | extend status = trim(\" \", tostring(properties.status.code))\r\n        | extend cause = trim(\" \", tostring(properties.status.cause))\r\n        | extend assessmentKey = tostring(name)\r\n        | where assessmentKey == \"7d9b04d9-a520-4bba-9640-89ba4c53f398\"",
+              "size": 4,
+              "title": "SQL Databases not running on TLS 1.2",
+              "queryType": 1,
+              "resourceType": "microsoft.resourcegraph/resources",
+              "crossComponentResources": [
+                "value::selected"
+              ]
+            },
+            "name": "query - 1"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "securityresources\r\n        | where type == \"microsoft.security/assessments\"\r\n        | extend source = trim(' ', tolower(tostring(properties.resourceDetails.Source)))\r\n                                          | extend resourceId = trim(' ', tolower(tostring(case(\r\n                                                                                    source =~ \"azure\", properties.resourceDetails.Id,\r\n                                                                                    source =~ \"aws\" and isnotempty(tostring(properties.resourceDetails.ConnectorId)), properties.resourceDetails.Id,\r\n                                                                                    source =~ \"gcp\" and isnotempty(tostring(properties.resourceDetails.ConnectorId)), properties.resourceDetails.Id,\r\n                                                                                    source =~ 'aws', properties.resourceDetails.AzureResourceId,\r\n                                                                                    source =~ 'gcp', properties.resourceDetails.AzureResourceId,\r\n                                                                                    extract('^(.+)/providers/Microsoft.Security/assessments/.+$',1,id)\r\n                                                                                    ))))\r\n        | extend status = trim(\" \", tostring(properties.status.code))\r\n        | extend cause = trim(\" \", tostring(properties.status.cause))\r\n        | extend assessmentKey = tostring(name)\r\n        | where assessmentKey == \"651967bf-044e-4bde-8376-3e08e0600105\"",
+              "size": 4,
+              "title": "Transparent Data Encryption on SQL Databases is not enabled",
+              "queryType": 1,
+              "resourceType": "microsoft.resourcegraph/resources",
+              "crossComponentResources": [
+                "value::selected"
+              ]
+            },
+            "name": "query - 0"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "securityresources\r\n        | where type == \"microsoft.security/assessments\"\r\n        | extend source = trim(' ', tolower(tostring(properties.resourceDetails.Source)))\r\n                                          | extend resourceId = trim(' ', tolower(tostring(case(\r\n                                                                                    source =~ \"azure\", properties.resourceDetails.Id,\r\n                                                                                    source =~ \"aws\" and isnotempty(tostring(properties.resourceDetails.ConnectorId)), properties.resourceDetails.Id,\r\n                                                                                    source =~ \"gcp\" and isnotempty(tostring(properties.resourceDetails.ConnectorId)), properties.resourceDetails.Id,\r\n                                                                                    source =~ 'aws', properties.resourceDetails.AzureResourceId,\r\n                                                                                    source =~ 'gcp', properties.resourceDetails.AzureResourceId,\r\n                                                                                    extract('^(.+)/providers/Microsoft.Security/assessments/.+$',1,id)\r\n                                                                                    ))))\r\n        | extend status = trim(\" \", tostring(properties.status.code))\r\n        | extend cause = trim(\" \", tostring(properties.status.cause))\r\n        | extend assessmentKey = tostring(name)\r\n        | where assessmentKey == \"22e93e92-4a31-b4cd-d640-3ef908430aa6\"",
+              "size": 4,
+              "title": "SQL Databases with Public Access",
+              "queryType": 1,
+              "resourceType": "microsoft.resourcegraph/resources",
+              "crossComponentResources": [
+                "value::selected"
+              ]
+            },
+            "name": "query - 2"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "securityresources\r\n        | where type == \"microsoft.security/assessments\"\r\n        | extend source = trim(' ', tolower(tostring(properties.resourceDetails.Source)))\r\n                                          | extend resourceId = trim(' ', tolower(tostring(case(\r\n                                                                                    source =~ \"azure\", properties.resourceDetails.Id,\r\n                                                                                    source =~ \"aws\" and isnotempty(tostring(properties.resourceDetails.ConnectorId)), properties.resourceDetails.Id,\r\n                                                                                    source =~ \"gcp\" and isnotempty(tostring(properties.resourceDetails.ConnectorId)), properties.resourceDetails.Id,\r\n                                                                                    source =~ 'aws', properties.resourceDetails.AzureResourceId,\r\n                                                                                    source =~ 'gcp', properties.resourceDetails.AzureResourceId,\r\n                                                                                    extract('^(.+)/providers/Microsoft.Security/assessments/.+$',1,id)\r\n                                                                                    ))))\r\n        | extend status = trim(\" \", tostring(properties.status.code))\r\n        | extend cause = trim(\" \", tostring(properties.status.cause))\r\n        | extend assessmentKey = tostring(name)\r\n        | where assessmentKey == \"82e20e14-edc5-4373-bfc4-f13121257c37\"",
+              "size": 4,
+              "title": "SQL Databases with Vulnerabilities",
+              "queryType": 1,
+              "resourceType": "microsoft.resourcegraph/resources",
+              "crossComponentResources": [
+                "value::selected"
+              ]
+            },
+            "name": "query - 3"
+          }
+        ]
+      },
+      "name": "group - 0"
+    }
+  ],
+  "fallbackResourceIds": [
+    "Azure Monitor"
+  ],
+  "$schema": "https://github.com/Microsoft/Application-Insights-Workbooks/blob/master/schema/workbook.json"
+}

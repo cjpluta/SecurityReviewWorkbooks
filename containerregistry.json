@@ -1,0 +1,66 @@
+
+{
+  "version": "Notebook/1.0",
+  "items": [
+    {
+      "type": 12,
+      "content": {
+        "version": "NotebookGroup/1.0",
+        "groupType": "editable",
+        "title": "Container Registries",
+        "items": [
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "securityresources | where type =~ \"microsoft.security/assessments/subassessments\"\r\n        | extend assessmentKey=extract(@\"(?i)providers/Microsoft.Security/assessments/([^/]*)\", 1, id), subAssessmentId=tostring(properties.id), parentResourceId= extract(\"(.+)/providers/Microsoft.Security\", 1, id)\r\n        | extend resourceId = tostring(properties.resourceDetails.id)\r\n        | extend subAssessmentName=tostring(properties.displayName),\r\n            subAssessmentDescription=tostring(properties.description),\r\n            subAssessmentRemediation=tostring(properties.remediation),\r\n            subAssessmentCategory=tostring(properties.category),\r\n            subAssessmentImpact=tostring(properties.impact),\r\n            severity=tostring(properties.status.severity),\r\n            status=tostring(properties.status.code),\r\n            cause=tostring(properties.status.cause),\r\n            statusDescription=tostring(properties.status.description),\r\n            additionalData=tostring(properties.additionalData)\r\n        | where assessmentKey == \"c0b7cfc6-3172-465a-b378-53c7ff2cc0d5\"\r\n                      | where status == \"Unhealthy\"\r\n        | summarize numOfResources=dcount(resourceId), timeGenerated=arg_max(todatetime(properties.timeGenerated), additionalData) by assessmentKey, subAssessmentId, subAssessmentName, subAssessmentCategory, severity, status, cause, statusDescription, subAssessmentDescription, subAssessmentRemediation, subAssessmentImpact\r\n        | extend high = iff(severity == \"High\", 3,0), medium = iff(severity == \"Medium\", 2, 0), low = iff(severity == \"Low\", 1 ,0)\r\n        | extend all = high + medium + low\r\n        | order by all desc, numOfResources desc",
+              "size": 4,
+              "title": "Container Registries Images Vulnerabilities",
+              "queryType": 1,
+              "resourceType": "microsoft.resourcegraph/resources",
+              "crossComponentResources": [
+                "value::selected"
+              ]
+            },
+            "name": "query - 1"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "securityresources\r\n        | where type == \"microsoft.security/assessments\"\r\n        | extend source = trim(' ', tolower(tostring(properties.resourceDetails.Source)))\r\n                                          | extend resourceId = trim(' ', tolower(tostring(case(\r\n                                                                                    source =~ \"azure\", properties.resourceDetails.Id,\r\n                                                                                    source =~ \"aws\" and isnotempty(tostring(properties.resourceDetails.ConnectorId)), properties.resourceDetails.Id,\r\n                                                                                    source =~ \"gcp\" and isnotempty(tostring(properties.resourceDetails.ConnectorId)), properties.resourceDetails.Id,\r\n                                                                                    source =~ 'aws', properties.resourceDetails.AzureResourceId,\r\n                                                                                    source =~ 'gcp', properties.resourceDetails.AzureResourceId,\r\n                                                                                    extract('^(.+)/providers/Microsoft.Security/assessments/.+$',1,id)\r\n                                                                                    ))))\r\n        | extend status = trim(\" \", tostring(properties.status.code))\r\n        | extend cause = trim(\" \", tostring(properties.status.cause))\r\n        | extend assessmentKey = tostring(name)\r\n        | where assessmentKey == \"1adedc38-e74a-b58b-28f2-2bdb8058927d\"",
+              "size": 4,
+              "title": "Container Registries with Public Network Access",
+              "queryType": 1,
+              "resourceType": "microsoft.resourcegraph/resources",
+              "crossComponentResources": [
+                "value::selected"
+              ]
+            },
+            "name": "query - 0"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "securityresources\r\n        | where type == \"microsoft.security/assessments\"\r\n        | extend source = trim(' ', tolower(tostring(properties.resourceDetails.Source)))\r\n                                          | extend resourceId = trim(' ', tolower(tostring(case(\r\n                                                                                    source =~ \"azure\", properties.resourceDetails.Id,\r\n                                                                                    source =~ \"aws\" and isnotempty(tostring(properties.resourceDetails.ConnectorId)), properties.resourceDetails.Id,\r\n                                                                                    source =~ \"gcp\" and isnotempty(tostring(properties.resourceDetails.ConnectorId)), properties.resourceDetails.Id,\r\n                                                                                    source =~ 'aws', properties.resourceDetails.AzureResourceId,\r\n                                                                                    source =~ 'gcp', properties.resourceDetails.AzureResourceId,\r\n                                                                                    extract('^(.+)/providers/Microsoft.Security/assessments/.+$',1,id)\r\n                                                                                    ))))\r\n        | extend status = trim(\" \", tostring(properties.status.code))\r\n        | extend cause = trim(\" \", tostring(properties.status.cause))\r\n        | extend assessmentKey = tostring(name)\r\n        | where assessmentKey == \"9b828565-a0ed-61c2-6bf3-1afc99a9b2ca\"",
+              "size": 4,
+              "title": "Container Registries with Unrestricted Network Access",
+              "queryType": 1,
+              "resourceType": "microsoft.resourcegraph/resources",
+              "crossComponentResources": [
+                "value::selected"
+              ]
+            },
+            "name": "query - 2"
+          }
+        ]
+      },
+      "name": "group - 0"
+    }
+  ],
+  "fallbackResourceIds": [
+    "Azure Monitor"
+  ],
+  "$schema": "https://github.com/Microsoft/Application-Insights-Workbooks/blob/master/schema/workbook.json"
+}
