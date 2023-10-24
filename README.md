@@ -14,6 +14,22 @@ Thee workbooks assume that you have the appropriate permissions to deploy Azure 
 
 This Security Review workbook consists of several Azure Monitor workbooks. You can deploy these to your Azure Subscription in any Resource Group. Currently, copy the Workbook code into the advanced editor of a workbook. 
 
+## Roadmap
+To-do list:
+
+**Usability**
+  - Auto-deploy template
+  - Import workbooks as tabs in a single view
+
+**Additional resource types**
+  - Virtual Machines and VMSS
+  - Networking
+  - App Services / Functions
+  - API Management
+  - Identity
+  - Key Vault
+  - Application Gateway
+
 ## Contributing
 
 This project welcomes contributions and suggestions.  Most contributions require you to agree to a
