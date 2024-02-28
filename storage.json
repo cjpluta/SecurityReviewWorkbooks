@@ -2,60 +2,484 @@
   "version": "Notebook/1.0",
   "items": [
     {
+      "type": 1,
+      "content": {
+        "json": "# Security Review Workbook - Storage Accounts"
+      },
+      "name": "text - 2"
+    },
+    {
+      "type": 9,
+      "content": {
+        "version": "KqlParameterItem/1.0",
+        "crossComponentResources": [
+          "{Subscription}"
+        ],
+        "parameters": [
+          {
+            "id": "fd92b5ec-7695-4d16-8925-18c2c76dc94f",
+            "version": "KqlParameterItem/1.0",
+            "name": "Subscription",
+            "label": "Subscription(s)",
+            "type": 6,
+            "multiSelect": true,
+            "quote": "'",
+            "delimiter": ",",
+            "query": "resources\r\n| where type == \"microsoft.storage/storageaccounts\"\r\n| distinct subscriptionId\r\n| project value = subscriptionId, label = subscriptionId, selected = true",
+            "crossComponentResources": [
+              "value::all"
+            ],
+            "typeSettings": {
+              "additionalResourceOptions": []
+            },
+            "timeContext": {
+              "durationMs": 86400000
+            },
+            "queryType": 1,
+            "resourceType": "microsoft.resourcegraph/resources"
+          },
+          {
+            "id": "f021be56-0461-48ab-a18f-f16d83e0be2b",
+            "version": "KqlParameterItem/1.0",
+            "name": "MDCRecs",
+            "type": 2,
+            "isRequired": true,
+            "query": "securityresources\r\n| where type == \"microsoft.security/assessments\"\r\n| extend ResourceType = properties.resourceDetails.ResourceType\r\n| where ResourceType == \"microsoft.storage/storageaccounts\"\r\n| extend ResourceId = properties.resourceDetails.ResourceId,\r\n    displayName = properties.displayName,\r\n    status = properties.status.code,\r\n    recdescription = properties.metadata.description,\r\n    remediationDescription = properties.metadata.remediationDescription\r\n| where status == \"Unhealthy\"\r\n| summarize reccount = count()\r\n| project label = reccount, value = reccount, selected = 1",
+            "crossComponentResources": [
+              "{Subscription}"
+            ],
+            "isHiddenWhenLocked": true,
+            "typeSettings": {
+              "additionalResourceOptions": []
+            },
+            "queryType": 1,
+            "resourceType": "microsoft.resourcegraph/resources"
+          }
+        ],
+        "style": "pills",
+        "queryType": 1,
+        "resourceType": "microsoft.resourcegraph/resources"
+      },
+      "name": "Workbook-Global-Parameters"
+    },
+    {
+      "type": 1,
+      "content": {
+        "json": "You can use this workbook as part of a Security Review to identify Storage Accounts with configurations that do not align to the security recommendations for Azure Storage Accounts.\r\n\r\nRead more in the [Well Architected Framework for Storage Accounts](https://learn.microsoft.com/en-us/azure/well-architected/services/storage/storage-accounts/security)",
+        "style": "info"
+      },
+      "name": "text - 3"
+    },
+    {
       "type": 12,
       "content": {
         "version": "NotebookGroup/1.0",
         "groupType": "editable",
-        "title": "Storage",
         "items": [
+          {
+            "type": 1,
+            "content": {
+              "json": "## Storage Accounts open to the Internet"
+            },
+            "name": "text - 5"
+          },
+          {
+            "type": 1,
+            "content": {
+              "json": "By default, network access to Storage Accounts isn't restricted and is open to all traffic coming from the internet. Access to storage accounts should be granted to specific [Azure Virtual Networks](https://learn.microsoft.com/en-us/azure/storage/common/storage-network-security?tabs=azure-portal) only whenever possible or use [private endpoints](https://learn.microsoft.com/en-us/azure/private-link/private-endpoint-overview) to allow clients on a virtual network (VNet) to access data securely over a Private Link. Reference [Use private endpoints for Azure Storage](https://learn.microsoft.com/en-us/azure/storage/common/storage-private-endpoints) for more information. Exceptions can be made for Storage Accounts that need to be accessible over the internet.",
+              "style": "info"
+            },
+            "name": "StorageAccounts-InternetFacing-text"
+          },
           {
             "type": 3,
             "content": {
               "version": "KqlItem/1.0",
               "query": "resources\r\n| extend type == \"microsoft.storage/storageaccounts\"\r\n| where properties['networkAcls']['defaultAction'] == \"Allow\"\r\n| project id, resourceGroup, kind, location, subscriptionId",
-              "size": 4,
-              "title": "Storage Accounts on the Internet",
+              "size": 1,
+              "showAnalytics": true,
+              "showExportToExcel": true,
               "queryType": 1,
               "resourceType": "microsoft.resourcegraph/resources",
               "crossComponentResources": [
                 "value::selected"
-              ]
+              ],
+              "gridSettings": {
+                "formatters": [
+                  {
+                    "columnMatch": "id",
+                    "formatter": 13,
+                    "formatOptions": {
+                      "linkTarget": "Resource",
+                      "linkIsContextBlade": true,
+                      "showIcon": true
+                    }
+                  },
+                  {
+                    "columnMatch": "resourceGroup",
+                    "formatter": 14,
+                    "formatOptions": {
+                      "linkTarget": null,
+                      "showIcon": true
+                    }
+                  },
+                  {
+                    "columnMatch": "location",
+                    "formatter": 17
+                  },
+                  {
+                    "columnMatch": "subscriptionId",
+                    "formatter": 15,
+                    "formatOptions": {
+                      "linkTarget": "Resource",
+                      "linkIsContextBlade": true,
+                      "showIcon": true
+                    }
+                  }
+                ]
+              }
             },
-            "name": "query - 1"
+            "name": "StorageAccounts-InternetOpen"
+          },
+          {
+            "type": 1,
+            "content": {
+              "json": "## Storage Accounts with Keys Enabled"
+            },
+            "name": "StorageAccounts-KeysEnabled-Header"
+          },
+          {
+            "type": 1,
+            "content": {
+              "json": "It's recommended to use Azure AD to authorize requests to Azure Storage and to [prevent Shared Key Authorization](https://learn.microsoft.com/en-us/azure/storage/common/shared-key-authorization-prevent?tabs=portal). For scenarios that require Shared Key authorization, always prefer SAS tokens over distributing the Shared Key.",
+              "style": "info"
+            },
+            "name": "Storage-KeysEnabled-Text"
           },
           {
             "type": 3,
             "content": {
               "version": "KqlItem/1.0",
               "query": "resources\r\n| where type == \"microsoft.storage/storageaccounts\"\r\n| where properties['allowSharedKeyAccess'] == \"true\"\r\n| project id, resourceGroup, kind, location, subscriptionId",
-              "size": 4,
-              "title": "Storage Accounts with Keys Enabled",
+              "size": 1,
+              "showAnalytics": true,
+              "showExportToExcel": true,
               "queryType": 1,
               "resourceType": "microsoft.resourcegraph/resources",
               "crossComponentResources": [
                 "value::selected"
-              ]
+              ],
+              "gridSettings": {
+                "formatters": [
+                  {
+                    "columnMatch": "id",
+                    "formatter": 13,
+                    "formatOptions": {
+                      "linkTarget": "Resource",
+                      "linkIsContextBlade": true,
+                      "showIcon": true
+                    }
+                  },
+                  {
+                    "columnMatch": "resourceGroup",
+                    "formatter": 14,
+                    "formatOptions": {
+                      "linkTarget": null,
+                      "showIcon": true
+                    }
+                  },
+                  {
+                    "columnMatch": "location",
+                    "formatter": 17
+                  },
+                  {
+                    "columnMatch": "subscriptionId",
+                    "formatter": 15,
+                    "formatOptions": {
+                      "linkTarget": "Resource",
+                      "linkIsContextBlade": true,
+                      "showIcon": true
+                    }
+                  }
+                ]
+              }
             },
-            "name": "query - 0"
+            "name": "StorageAccounts-KeysEnabled"
+          },
+          {
+            "type": 1,
+            "content": {
+              "json": "## Storage Accounts with Blob Public Access"
+            },
+            "name": "StorageAccounts-BlobPublicAccess-Header"
           },
           {
             "type": 3,
             "content": {
               "version": "KqlItem/1.0",
               "query": "resources\r\n| where type =~ 'Microsoft.Storage/storageAccounts'\r\n| extend allowBlobPublicAccess = parse_json(properties).allowBlobPublicAccess\r\n| project id, resourceGroup, allowBlobPublicAccess, subscriptionId",
-              "size": 4,
-              "title": "Storage Accounts with Blob Public Access",
+              "size": 1,
+              "showAnalytics": true,
+              "showExportToExcel": true,
               "queryType": 1,
               "resourceType": "microsoft.resourcegraph/resources",
               "crossComponentResources": [
                 "value::selected"
-              ]
+              ],
+              "gridSettings": {
+                "formatters": [
+                  {
+                    "columnMatch": "id",
+                    "formatter": 13,
+                    "formatOptions": {
+                      "linkTarget": "Resource",
+                      "linkIsContextBlade": true,
+                      "showIcon": true
+                    }
+                  },
+                  {
+                    "columnMatch": "allowBlobPublicAccess",
+                    "formatter": 18,
+                    "formatOptions": {
+                      "thresholdsOptions": "icons",
+                      "thresholdsGrid": [
+                        {
+                          "operator": "==",
+                          "thresholdValue": "true",
+                          "representation": "2",
+                          "text": "True"
+                        },
+                        {
+                          "operator": "Default",
+                          "thresholdValue": null,
+                          "representation": "success",
+                          "text": "{0}{1}"
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "columnMatch": "subscriptionId",
+                    "formatter": 15,
+                    "formatOptions": {
+                      "linkTarget": "Resource",
+                      "linkIsContextBlade": true,
+                      "showIcon": true
+                    }
+                  }
+                ]
+              }
             },
-            "name": "query - 2"
+            "name": "StorageAccounts-BlobPublicAccess-Query"
+          },
+          {
+            "type": 1,
+            "content": {
+              "json": "## Defender for Storage Coverage"
+            },
+            "name": "MDCStorage-header"
+          },
+          {
+            "type": 1,
+            "content": {
+              "json": "Azure Defender for Azure Storage provides an extra layer of security intelligence that detects unusual and potentially harmful attempts to access or exploit storage accounts. Security alerts are triggered in Azure Security Center when anomalies in activity occur. Alerts are also sent through email to subscription administrators, with details of suspicious activity and recommendations on how to investigate, and remediate threats. For more information, reference [Configure Azure Defender for Azure Storage](https://learn.microsoft.com/en-us/azure/storage/common/azure-defender-storage-configure?tabs=azure-security-center).",
+              "style": "info"
+            },
+            "name": "MDCStorage-Text"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "securityresources\r\n| where type == \"microsoft.security/pricings\" and name == \"StorageAccounts\"\r\n| extend resourcesCoverageStatus = properties.resourcesCoverageStatus,\r\n    pricingTier = properties.pricingTier\r\n| project subscriptionId, name, resourcesCoverageStatus, pricingTier",
+              "size": 1,
+              "queryType": 1,
+              "resourceType": "microsoft.resourcegraph/resources",
+              "crossComponentResources": [
+                "{Subscription}"
+              ],
+              "gridSettings": {
+                "formatters": [
+                  {
+                    "columnMatch": "subscriptionId",
+                    "formatter": 15,
+                    "formatOptions": {
+                      "linkTarget": null,
+                      "showIcon": true,
+                      "customColumnWidthSetting": "50ch"
+                    }
+                  },
+                  {
+                    "columnMatch": "resourcesCoverageStatus",
+                    "formatter": 18,
+                    "formatOptions": {
+                      "thresholdsOptions": "icons",
+                      "thresholdsGrid": [
+                        {
+                          "operator": "==",
+                          "thresholdValue": "FullyCovered",
+                          "representation": "success",
+                          "text": "{0}{1}"
+                        },
+                        {
+                          "operator": "Default",
+                          "thresholdValue": null,
+                          "representation": "Important",
+                          "text": "{0}{1}"
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "columnMatch": "pricingTier",
+                    "formatter": 1
+                  }
+                ],
+                "labelSettings": [
+                  {
+                    "columnId": "subscriptionId",
+                    "label": "Subscription"
+                  },
+                  {
+                    "columnId": "name",
+                    "label": "Defender Plan"
+                  },
+                  {
+                    "columnId": "resourcesCoverageStatus",
+                    "label": "Coverage Status"
+                  },
+                  {
+                    "columnId": "pricingTier",
+                    "label": "Pricing Tier"
+                  }
+                ]
+              }
+            },
+            "name": "DfS-query"
+          },
+          {
+            "type": 1,
+            "content": {
+              "json": "## Recommendations from Defender for Cloud"
+            },
+            "conditionalVisibility": {
+              "parameterName": "{MDCRecs}",
+              "comparison": "isNotEqualTo",
+              "value": "0"
+            },
+            "name": "MDC-Text"
+          },
+          {
+            "type": 1,
+            "content": {
+              "json": "Recommendations in Defender for Cloud are based on the [Microsoft cloud security benchmark](https://learn.microsoft.com/en-us/security/benchmark/azure/introduction). the Microsoft cloud security benchmark is the Microsoft-authored set of guidelines for security and compliance best practices based on common compliance frameworks. This widely respected benchmark builds on the controls from the [Center for Internet Security (CIS)](https://www.cisecurity.org/benchmark/azure/) and the [National Institute of Standards and Technology (NIST)](https://www.nist.gov/) with a focus on cloud-centric security.\r\n\r\nTo learn about how to respond to these recommendations, see [Remediate recommendations in Defender for Cloud](https://learn.microsoft.com/en-us/azure/defender-for-cloud/implement-security-recommendations).\r\n\r\nYou can view the full list of recommendations available from Defender for Cloud in [this article](https://learn.microsoft.com/en-us/azure/defender-for-cloud/recommendations-reference).",
+              "style": "info"
+            },
+            "conditionalVisibility": {
+              "parameterName": "{MDCRecs}",
+              "comparison": "isNotEqualTo",
+              "value": "0"
+            },
+            "name": "MDCRecs-info"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "securityresources\r\n| where type == \"microsoft.security/assessments\"\r\n| extend ResourceType = properties.resourceDetails.ResourceType\r\n| where ResourceType == \"microsoft.storage/storageaccounts\"\r\n| extend ResourceId = properties.resourceDetails.ResourceId,\r\n    displayName = properties.displayName,\r\n    status = properties.status.code,\r\n    recdescription = properties.metadata.description,\r\n    remediationDescription = properties.metadata.remediationDescription\r\n| where status == \"Unhealthy\"\r\n| project ResourceId, resourceGroup, displayName, status, recdescription, remediationDescription",
+              "size": 0,
+              "showAnalytics": true,
+              "noDataMessage": "No recommendations detected for your storage accounts",
+              "noDataMessageStyle": 3,
+              "showExportToExcel": true,
+              "queryType": 1,
+              "resourceType": "microsoft.resourcegraph/resources",
+              "crossComponentResources": [
+                "{Subscription}"
+              ],
+              "gridSettings": {
+                "formatters": [
+                  {
+                    "columnMatch": "$gen_group",
+                    "formatter": 0,
+                    "formatOptions": {
+                      "customColumnWidthSetting": "90ch"
+                    }
+                  },
+                  {
+                    "columnMatch": "ResourceId",
+                    "formatter": 13,
+                    "formatOptions": {
+                      "linkTarget": "Resource",
+                      "linkIsContextBlade": true,
+                      "showIcon": true
+                    }
+                  },
+                  {
+                    "columnMatch": "resourceGroup",
+                    "formatter": 14,
+                    "formatOptions": {
+                      "linkTarget": null,
+                      "showIcon": true
+                    }
+                  },
+                  {
+                    "columnMatch": "displayName",
+                    "formatter": 5
+                  },
+                  {
+                    "columnMatch": "recdescription",
+                    "formatter": 1
+                  },
+                  {
+                    "columnMatch": "remediationDescription",
+                    "formatter": 1,
+                    "formatOptions": {
+                      "linkTarget": "GenericDetails",
+                      "linkIsContextBlade": true
+                    }
+                  },
+                  {
+                    "columnMatch": "$gen_group",
+                    "formatter": 0,
+                    "formatOptions": {
+                      "customColumnWidthSetting": "90ch"
+                    }
+                  }
+                ],
+                "rowLimit": 2000,
+                "hierarchySettings": {
+                  "treeType": 1,
+                  "groupBy": [
+                    "displayName"
+                  ]
+                },
+                "labelSettings": [
+                  {
+                    "columnId": "displayName",
+                    "label": "Recommendation"
+                  },
+                  {
+                    "columnId": "recdescription",
+                    "label": "Description"
+                  },
+                  {
+                    "columnId": "remediationDescription",
+                    "label": "Remediation"
+                  }
+                ]
+              }
+            },
+            "conditionalVisibility": {
+              "parameterName": "{MDCRecs}",
+              "comparison": "isNotEqualTo",
+              "value": "0"
+            },
+            "name": "MDC-Recommendations-Query"
           }
         ]
       },
-      "name": "group - 0"
+      "name": "StorageGroup"
     }
   ],
   "fallbackResourceIds": [
