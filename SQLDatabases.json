@@ -2,6 +2,58 @@
   "version": "Notebook/1.0",
   "items": [
     {
+      "type": 1,
+      "content": {
+        "json": "# SQL Server Security Workbook"
+      },
+      "name": "Workbook-header-text"
+    },
+    {
+      "type": 1,
+      "content": {
+        "json": "You can use this workbook to identify current security findings for your SQL Databases in all subscriptions where [Defender for Databases](https://learn.microsoft.com/en-us/azure/defender-for-cloud/tutorial-enable-databases-plan) has been enabled."
+      },
+      "name": "Workbook-explain-text"
+    },
+    {
+      "type": 9,
+      "content": {
+        "version": "KqlParameterItem/1.0",
+        "crossComponentResources": [
+          "value::selected"
+        ],
+        "parameters": [
+          {
+            "id": "724d8899-24db-4910-9c33-a816facf860e",
+            "version": "KqlParameterItem/1.0",
+            "name": "Subscriptions",
+            "label": "Subscription(s)",
+            "type": 6,
+            "isRequired": true,
+            "multiSelect": true,
+            "quote": "'",
+            "delimiter": ",",
+            "query": "resourcecontainers\r\n| where type == \"microsoft.resources/subscriptions\"\r\n| project value = id, label = name, selected = true",
+            "crossComponentResources": [
+              "value::selected"
+            ],
+            "typeSettings": {
+              "additionalResourceOptions": []
+            },
+            "timeContext": {
+              "durationMs": 86400000
+            },
+            "queryType": 1,
+            "resourceType": "microsoft.resourcegraph/resources"
+          }
+        ],
+        "style": "pills",
+        "queryType": 1,
+        "resourceType": "microsoft.resourcegraph/resources"
+      },
+      "name": "Workbook-Global-Parameters"
+    },
+    {
       "type": 12,
       "content": {
         "version": "NotebookGroup/1.0",
@@ -12,61 +64,325 @@
             "type": 3,
             "content": {
               "version": "KqlItem/1.0",
-              "query": "securityresources\r\n        | where type == \"microsoft.security/assessments\"\r\n        | extend source = trim(' ', tolower(tostring(properties.resourceDetails.Source)))\r\n                                          | extend resourceId = trim(' ', tolower(tostring(case(\r\n                                                                                    source =~ \"azure\", properties.resourceDetails.Id,\r\n                                                                                    source =~ \"aws\" and isnotempty(tostring(properties.resourceDetails.ConnectorId)), properties.resourceDetails.Id,\r\n                                                                                    source =~ \"gcp\" and isnotempty(tostring(properties.resourceDetails.ConnectorId)), properties.resourceDetails.Id,\r\n                                                                                    source =~ 'aws', properties.resourceDetails.AzureResourceId,\r\n                                                                                    source =~ 'gcp', properties.resourceDetails.AzureResourceId,\r\n                                                                                    extract('^(.+)/providers/Microsoft.Security/assessments/.+$',1,id)\r\n                                                                                    ))))\r\n        | extend status = trim(\" \", tostring(properties.status.code))\r\n        | extend cause = trim(\" \", tostring(properties.status.cause))\r\n        | extend assessmentKey = tostring(name)\r\n        | where assessmentKey == \"7d9b04d9-a520-4bba-9640-89ba4c53f398\"",
-              "size": 4,
+              "query": "securityresources\r\n| where type == \"microsoft.security/assessments\"\r\n| extend source = trim(' ', tolower(tostring(properties.resourceDetails.Source)))\r\n| extend resourceId = trim(' ', tolower(tostring(case(\r\n    source =~ \"azure\", properties.resourceDetails.Id,\r\n    source =~ \"aws\" and isnotempty(tostring(properties.resourceDetails.ConnectorId)), properties.resourceDetails.Id,\r\n    source =~ \"gcp\" and isnotempty(tostring(properties.resourceDetails.ConnectorId)), properties.resourceDetails.Id,\r\n    source =~ 'aws', properties.resourceDetails.AzureResourceId,\r\n    source =~ 'gcp', properties.resourceDetails.AzureResourceId,\r\n    extract('^(.+)/providers/Microsoft.Security/assessments/.+$', 1, id)\r\n    ))))\r\n| extend status = trim(\" \", tostring(properties.status.code))\r\n| extend cause = trim(\" \", tostring(properties.status.cause))\r\n| extend assessmentKey = tostring(name)\r\n| where assessmentKey == \"7d9b04d9-a520-4bba-9640-89ba4c53f398\"",
+              "size": 3,
               "title": "SQL Databases not running on TLS 1.2",
+              "noDataMessage": "No SQL Databases not running on TLS 1.2 detected",
+              "noDataMessageStyle": 3,
               "queryType": 1,
               "resourceType": "microsoft.resourcegraph/resources",
               "crossComponentResources": [
-                "value::selected"
+                "{Subscriptions}"
               ]
             },
-            "name": "query - 1"
+            "name": "SQLDBsTLS-arg-query"
           },
           {
             "type": 3,
             "content": {
               "version": "KqlItem/1.0",
-              "query": "securityresources\r\n        | where type == \"microsoft.security/assessments\"\r\n        | extend source = trim(' ', tolower(tostring(properties.resourceDetails.Source)))\r\n                                          | extend resourceId = trim(' ', tolower(tostring(case(\r\n                                                                                    source =~ \"azure\", properties.resourceDetails.Id,\r\n                                                                                    source =~ \"aws\" and isnotempty(tostring(properties.resourceDetails.ConnectorId)), properties.resourceDetails.Id,\r\n                                                                                    source =~ \"gcp\" and isnotempty(tostring(properties.resourceDetails.ConnectorId)), properties.resourceDetails.Id,\r\n                                                                                    source =~ 'aws', properties.resourceDetails.AzureResourceId,\r\n                                                                                    source =~ 'gcp', properties.resourceDetails.AzureResourceId,\r\n                                                                                    extract('^(.+)/providers/Microsoft.Security/assessments/.+$',1,id)\r\n                                                                                    ))))\r\n        | extend status = trim(\" \", tostring(properties.status.code))\r\n        | extend cause = trim(\" \", tostring(properties.status.cause))\r\n        | extend assessmentKey = tostring(name)\r\n        | where assessmentKey == \"651967bf-044e-4bde-8376-3e08e0600105\"",
-              "size": 4,
+              "query": "securityresources\r\n| where type == \"microsoft.security/assessments\"\r\n| extend source = trim(' ', tolower(tostring(properties.resourceDetails.Source)))\r\n| extend resourceId = trim(' ', tolower(tostring(case(\r\n    source =~ \"azure\", properties.resourceDetails.Id,\r\n    source =~ \"aws\" and isnotempty(tostring(properties.resourceDetails.ConnectorId)), properties.resourceDetails.Id,\r\n    source =~ \"gcp\" and isnotempty(tostring(properties.resourceDetails.ConnectorId)), properties.resourceDetails.Id,\r\n    source =~ 'aws', properties.resourceDetails.AzureResourceId,\r\n    source =~ 'gcp', properties.resourceDetails.AzureResourceId,\r\n    extract('^(.+)/providers/Microsoft.Security/assessments/.+$', 1, id)\r\n    ))))\r\n| extend status = tostring(properties.status.code),\r\n    securityIssue = tostring(properties.metadata.securityIssue),\r\n    userImpact = tostring(properties.metadata.userImpact),\r\n    implementationEffort = tostring(properties.metadata.implementationEffort),\r\n    link = strcat(\"https://\",tostring(properties.links.azurePortal))\r\n| extend assessmentKey = tostring(name)\r\n| where assessmentKey == \"651967bf-044e-4bde-8376-3e08e0600105\" and status != \"Healthy\"\r\n| project subscriptionId, resourceId, resourceGroup, securityIssue, userImpact, implementationEffort, link",
+              "size": 3,
               "title": "Transparent Data Encryption on SQL Databases is not enabled",
+              "noDataMessage": "No databases found with Transparent Data Encryption on SQL Databases is not enabled",
+              "noDataMessageStyle": 3,
               "queryType": 1,
               "resourceType": "microsoft.resourcegraph/resources",
               "crossComponentResources": [
-                "value::selected"
-              ]
+                "{Subscriptions}"
+              ],
+              "gridSettings": {
+                "formatters": [
+                  {
+                    "columnMatch": "$gen_group",
+                    "formatter": 15,
+                    "formatOptions": {
+                      "linkTarget": null,
+                      "showIcon": true
+                    }
+                  },
+                  {
+                    "columnMatch": "subscriptionId",
+                    "formatter": 5
+                  },
+                  {
+                    "columnMatch": "resourceId",
+                    "formatter": 13,
+                    "formatOptions": {
+                      "linkTarget": "Resource",
+                      "linkIsContextBlade": true,
+                      "showIcon": true
+                    }
+                  },
+                  {
+                    "columnMatch": "resourceGroup",
+                    "formatter": 14,
+                    "formatOptions": {
+                      "linkTarget": null,
+                      "showIcon": true
+                    }
+                  },
+                  {
+                    "columnMatch": "securityIssue",
+                    "formatter": 1
+                  },
+                  {
+                    "columnMatch": "userImpact",
+                    "formatter": 1
+                  },
+                  {
+                    "columnMatch": "implementationEffort",
+                    "formatter": 1
+                  },
+                  {
+                    "columnMatch": "link",
+                    "formatter": 7,
+                    "formatOptions": {
+                      "linkTarget": "Url",
+                      "linkLabel": "View Remediation detail"
+                    }
+                  }
+                ],
+                "hierarchySettings": {
+                  "treeType": 1,
+                  "groupBy": [
+                    "subscriptionId"
+                  ],
+                  "expandTopLevel": true
+                }
+              }
             },
-            "name": "query - 0"
+            "name": "SQLDB-DataEncryption-arg-query"
           },
           {
             "type": 3,
             "content": {
               "version": "KqlItem/1.0",
-              "query": "securityresources\r\n        | where type == \"microsoft.security/assessments\"\r\n        | extend source = trim(' ', tolower(tostring(properties.resourceDetails.Source)))\r\n                                          | extend resourceId = trim(' ', tolower(tostring(case(\r\n                                                                                    source =~ \"azure\", properties.resourceDetails.Id,\r\n                                                                                    source =~ \"aws\" and isnotempty(tostring(properties.resourceDetails.ConnectorId)), properties.resourceDetails.Id,\r\n                                                                                    source =~ \"gcp\" and isnotempty(tostring(properties.resourceDetails.ConnectorId)), properties.resourceDetails.Id,\r\n                                                                                    source =~ 'aws', properties.resourceDetails.AzureResourceId,\r\n                                                                                    source =~ 'gcp', properties.resourceDetails.AzureResourceId,\r\n                                                                                    extract('^(.+)/providers/Microsoft.Security/assessments/.+$',1,id)\r\n                                                                                    ))))\r\n        | extend status = trim(\" \", tostring(properties.status.code))\r\n        | extend cause = trim(\" \", tostring(properties.status.cause))\r\n        | extend assessmentKey = tostring(name)\r\n        | where assessmentKey == \"22e93e92-4a31-b4cd-d640-3ef908430aa6\"",
-              "size": 4,
+              "query": "securityresources\r\n| where type == \"microsoft.security/assessments\"\r\n| extend source = trim(' ', tolower(tostring(properties.resourceDetails.Source)))\r\n| extend resourceId = trim(' ', tolower(tostring(case(\r\n    source =~ \"azure\", properties.resourceDetails.Id,\r\n    source =~ \"aws\" and isnotempty(tostring(properties.resourceDetails.ConnectorId)), properties.resourceDetails.Id,\r\n    source =~ \"gcp\" and isnotempty(tostring(properties.resourceDetails.ConnectorId)), properties.resourceDetails.Id,\r\n    source =~ 'aws', properties.resourceDetails.AzureResourceId,\r\n    source =~ 'gcp', properties.resourceDetails.AzureResourceId,\r\n    extract('^(.+)/providers/Microsoft.Security/assessments/.+$', 1, id)\r\n    ))))\r\n| extend status = tostring(properties.status.code),\r\n    securityIssue = tostring(properties.metadata.securityIssue),\r\n    risklevel = tostring(properties.risk.level),\r\n    link = strcat(\"https://\",tostring(properties.links.azurePortal))\r\n| extend cause = trim(\" \", tostring(properties.status.cause))\r\n| extend assessmentKey = tostring(name)\r\n| where assessmentKey == \"22e93e92-4a31-b4cd-d640-3ef908430aa6\" and status == \"Unhealthy\"\r\n| project subscriptionId, resourceId, resourceGroup, securityIssue, risklevel, link",
+              "size": 0,
               "title": "SQL Databases with Public Access",
+              "noDataMessage": "NO SQL Databases with Public Access Enabled detected",
+              "noDataMessageStyle": 3,
               "queryType": 1,
               "resourceType": "microsoft.resourcegraph/resources",
               "crossComponentResources": [
-                "value::selected"
-              ]
+                "{Subscriptions}"
+              ],
+              "gridSettings": {
+                "formatters": [
+                  {
+                    "columnMatch": "$gen_group",
+                    "formatter": 15,
+                    "formatOptions": {
+                      "linkTarget": null,
+                      "showIcon": true
+                    }
+                  },
+                  {
+                    "columnMatch": "subscriptionId",
+                    "formatter": 5
+                  },
+                  {
+                    "columnMatch": "resourceId",
+                    "formatter": 13,
+                    "formatOptions": {
+                      "linkTarget": null,
+                      "showIcon": true
+                    }
+                  },
+                  {
+                    "columnMatch": "resourceGroup",
+                    "formatter": 14,
+                    "formatOptions": {
+                      "linkTarget": null,
+                      "showIcon": true
+                    }
+                  },
+                  {
+                    "columnMatch": "securityIssue",
+                    "formatter": 5
+                  },
+                  {
+                    "columnMatch": "risklevel",
+                    "formatter": 18,
+                    "formatOptions": {
+                      "thresholdsOptions": "icons",
+                      "thresholdsGrid": [
+                        {
+                          "operator": "==",
+                          "thresholdValue": "Low",
+                          "representation": "Sev3",
+                          "text": "{0}{1}"
+                        },
+                        {
+                          "operator": "==",
+                          "thresholdValue": "Medium",
+                          "representation": "Sev2",
+                          "text": "{0}{1}"
+                        },
+                        {
+                          "operator": "==",
+                          "thresholdValue": "High",
+                          "representation": "Sev1",
+                          "text": "{0}{1}"
+                        },
+                        {
+                          "operator": "==",
+                          "thresholdValue": "Critical",
+                          "representation": "Sev0",
+                          "text": "{0}{1}"
+                        },
+                        {
+                          "operator": "Default",
+                          "thresholdValue": null,
+                          "representation": "Blank",
+                          "text": "{0}{1}"
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "columnMatch": "link",
+                    "formatter": 7,
+                    "formatOptions": {
+                      "linkTarget": "Url",
+                      "linkLabel": "View Remediation detail"
+                    }
+                  }
+                ],
+                "hierarchySettings": {
+                  "treeType": 1,
+                  "groupBy": [
+                    "subscriptionId"
+                  ],
+                  "expandTopLevel": true
+                }
+              }
             },
-            "name": "query - 2"
+            "name": "SQL-PublicAccess-arg-query"
           },
           {
             "type": 3,
             "content": {
               "version": "KqlItem/1.0",
-              "query": "securityresources\r\n        | where type == \"microsoft.security/assessments\"\r\n        | extend source = trim(' ', tolower(tostring(properties.resourceDetails.Source)))\r\n                                          | extend resourceId = trim(' ', tolower(tostring(case(\r\n                                                                                    source =~ \"azure\", properties.resourceDetails.Id,\r\n                                                                                    source =~ \"aws\" and isnotempty(tostring(properties.resourceDetails.ConnectorId)), properties.resourceDetails.Id,\r\n                                                                                    source =~ \"gcp\" and isnotempty(tostring(properties.resourceDetails.ConnectorId)), properties.resourceDetails.Id,\r\n                                                                                    source =~ 'aws', properties.resourceDetails.AzureResourceId,\r\n                                                                                    source =~ 'gcp', properties.resourceDetails.AzureResourceId,\r\n                                                                                    extract('^(.+)/providers/Microsoft.Security/assessments/.+$',1,id)\r\n                                                                                    ))))\r\n        | extend status = trim(\" \", tostring(properties.status.code))\r\n        | extend cause = trim(\" \", tostring(properties.status.cause))\r\n        | extend assessmentKey = tostring(name)\r\n        | where assessmentKey == \"82e20e14-edc5-4373-bfc4-f13121257c37\"",
-              "size": 4,
+              "query": "securityresources\r\n| where type == \"microsoft.security/assessments\"\r\n| extend source = trim(' ', tolower(tostring(properties.resourceDetails.Source)))\r\n| extend resourceId = trim(' ', tolower(tostring(case(\r\n    source =~ \"azure\", properties.resourceDetails.Id,\r\n    source =~ \"aws\" and isnotempty(tostring(properties.resourceDetails.ConnectorId)), properties.resourceDetails.Id,\r\n    source =~ \"gcp\" and isnotempty(tostring(properties.resourceDetails.ConnectorId)), properties.resourceDetails.Id,\r\n    source =~ 'aws', properties.resourceDetails.AzureResourceId,\r\n    source =~ 'gcp', properties.resourceDetails.AzureResourceId,\r\n    extract('^(.+)/providers/Microsoft.Security/assessments/.+$', 1, id)\r\n    ))))\r\n| extend status = tostring(properties.status.code),\r\n    securityIssue = tostring(properties.metadata.securityIssue),\r\n    risklevel = tostring(properties.risk.level),\r\n    link = strcat(\"https://\",tostring(properties.links.azurePortal))\r\n| extend cause = trim(\" \", tostring(properties.status.cause))\r\n| extend assessmentKey = tostring(name)\r\n| where assessmentKey == \"82e20e14-edc5-4373-bfc4-f13121257c37\" and status != \"Healthy\"\r\n| project subscriptionId, resourceId, resourceGroup, status, cause, securityIssue, risklevel, link",
+              "size": 0,
               "title": "SQL Databases with Vulnerabilities",
+              "noDataMessage": "No SQL Databases with Vulnerabilities detected",
+              "noDataMessageStyle": 3,
               "queryType": 1,
               "resourceType": "microsoft.resourcegraph/resources",
               "crossComponentResources": [
-                "value::selected"
-              ]
+                "{Subscriptions}"
+              ],
+              "gridSettings": {
+                "formatters": [
+                  {
+                    "columnMatch": "$gen_group",
+                    "formatter": 15,
+                    "formatOptions": {
+                      "linkTarget": null,
+                      "showIcon": true
+                    }
+                  },
+                  {
+                    "columnMatch": "subscriptionId",
+                    "formatter": 5
+                  },
+                  {
+                    "columnMatch": "resourceId",
+                    "formatter": 13,
+                    "formatOptions": {
+                      "linkTarget": "Resource",
+                      "linkIsContextBlade": true,
+                      "showIcon": true
+                    }
+                  },
+                  {
+                    "columnMatch": "resourceGroup",
+                    "formatter": 14,
+                    "formatOptions": {
+                      "linkTarget": null,
+                      "showIcon": true
+                    }
+                  },
+                  {
+                    "columnMatch": "status",
+                    "formatter": 18,
+                    "formatOptions": {
+                      "thresholdsOptions": "icons",
+                      "thresholdsGrid": [
+                        {
+                          "operator": "==",
+                          "thresholdValue": "Unhealthy",
+                          "representation": "Sev0",
+                          "text": "{0}{1}"
+                        },
+                        {
+                          "operator": "==",
+                          "thresholdValue": "NotApplicable",
+                          "representation": "Sev2",
+                          "text": "{0}{1}"
+                        },
+                        {
+                          "operator": "Default",
+                          "thresholdValue": null,
+                          "representation": "Blank",
+                          "text": "{0}{1}"
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "columnMatch": "securityIssue",
+                    "formatter": 5
+                  },
+                  {
+                    "columnMatch": "risklevel",
+                    "formatter": 18,
+                    "formatOptions": {
+                      "thresholdsOptions": "icons",
+                      "thresholdsGrid": [
+                        {
+                          "operator": "==",
+                          "thresholdValue": "Critical",
+                          "representation": "Sev0",
+                          "text": "{0}{1}"
+                        },
+                        {
+                          "operator": "==",
+                          "thresholdValue": "High",
+                          "representation": "Sev1",
+                          "text": "{0}{1}"
+                        },
+                        {
+                          "operator": "Default",
+                          "thresholdValue": null,
+                          "representation": "Blank",
+                          "text": "{0}{1}"
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "columnMatch": "link",
+                    "formatter": 7,
+                    "formatOptions": {
+                      "linkTarget": "Url",
+                      "linkLabel": "View Remediation detail"
+                    }
+                  }
+                ],
+                "hierarchySettings": {
+                  "treeType": 1,
+                  "groupBy": [
+                    "subscriptionId"
+                  ],
+                  "expandTopLevel": true
+                }
+              }
             },
-            "name": "query - 3"
+            "name": "SQLDB-Vulnerabilities-arg-query"
           }
         ]
       },
