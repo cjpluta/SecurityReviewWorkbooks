@@ -1,0 +1,55 @@
+
+{
+    "version": "Notebook/1.0",
+    "items": [
+      {
+        "type": 3,
+        "content": {
+          "version": "KqlItem/1.0",
+          "query": "securityresources\r\n        | where type == \"microsoft.security/assessments\"\r\n        | extend source = trim(' ', tolower(tostring(properties.resourceDetails.Source)))\r\n                                          | extend resourceId = trim(' ', tolower(tostring(case(\r\n                                                                                    source =~ \"azure\", properties.resourceDetails.Id,\r\n                                                                                    source =~ \"aws\" and isnotempty(tostring(properties.resourceDetails.ConnectorId)), properties.resourceDetails.Id,\r\n                                                                                    source =~ \"gcp\" and isnotempty(tostring(properties.resourceDetails.ConnectorId)), properties.resourceDetails.Id,\r\n                                                                                    source =~ 'aws', properties.resourceDetails.AzureResourceId,\r\n                                                                                    source =~ 'gcp', properties.resourceDetails.AzureResourceId,\r\n                                                                                    extract('^(.+)/providers/Microsoft.Security/assessments/.+$',1,id)\r\n                                                                                    ))))\r\n        | extend status = trim(\" \", tostring(properties.status.code))\r\n        | extend cause = trim(\" \", tostring(properties.status.cause))\r\n        | extend assessmentKey = tostring(name)\r\n        | where assessmentKey == \"13b10b36-aa99-4db6-b00c-dcf87c4761e6\"",
+          "size": 0,
+          "title": "Azure AI Services should have key access disabled",
+          "queryType": 1,
+          "resourceType": "microsoft.resourcegraph/resources",
+          "crossComponentResources": [
+            "value::all"
+          ]
+        },
+        "name": "query - 1"
+      },
+      {
+        "type": 3,
+        "content": {
+          "version": "KqlItem/1.0",
+          "query": "securityresources\r\n        | where type == \"microsoft.security/assessments\"\r\n        | extend source = trim(' ', tolower(tostring(properties.resourceDetails.Source)))\r\n                                          | extend resourceId = trim(' ', tolower(tostring(case(\r\n                                                                                    source =~ \"azure\", properties.resourceDetails.Id,\r\n                                                                                    source =~ \"aws\" and isnotempty(tostring(properties.resourceDetails.ConnectorId)), properties.resourceDetails.Id,\r\n                                                                                    source =~ \"gcp\" and isnotempty(tostring(properties.resourceDetails.ConnectorId)), properties.resourceDetails.Id,\r\n                                                                                    source =~ 'aws', properties.resourceDetails.AzureResourceId,\r\n                                                                                    source =~ 'gcp', properties.resourceDetails.AzureResourceId,\r\n                                                                                    extract('^(.+)/providers/Microsoft.Security/assessments/.+$',1,id)\r\n                                                                                    ))))\r\n        | extend status = trim(\" \", tostring(properties.status.code))\r\n        | extend cause = trim(\" \", tostring(properties.status.cause))\r\n        | extend assessmentKey = tostring(name)\r\n        | where assessmentKey == \"54f53ddf-6ebd-461e-a247-394c542bc5d1\"",
+          "size": 0,
+          "title": "Cognitive Services should use private link",
+          "queryType": 1,
+          "resourceType": "microsoft.resourcegraph/resources",
+          "crossComponentResources": [
+            "value::all"
+          ]
+        },
+        "name": "query - 1"
+      },
+      {
+        "type": 3,
+        "content": {
+          "version": "KqlItem/1.0",
+          "query": "securityresources\r\n        | where type == \"microsoft.security/assessments\"\r\n        | extend source = trim(' ', tolower(tostring(properties.resourceDetails.Source)))\r\n                                          | extend resourceId = trim(' ', tolower(tostring(case(\r\n                                                                                    source =~ \"azure\", properties.resourceDetails.Id,\r\n                                                                                    source =~ \"aws\" and isnotempty(tostring(properties.resourceDetails.ConnectorId)), properties.resourceDetails.Id,\r\n                                                                                    source =~ \"gcp\" and isnotempty(tostring(properties.resourceDetails.ConnectorId)), properties.resourceDetails.Id,\r\n                                                                                    source =~ 'aws', properties.resourceDetails.AzureResourceId,\r\n                                                                                    source =~ 'gcp', properties.resourceDetails.AzureResourceId,\r\n                                                                                    extract('^(.+)/providers/Microsoft.Security/assessments/.+$',1,id)\r\n                                                                                    ))))\r\n        | extend status = trim(\" \", tostring(properties.status.code))\r\n        | extend cause = trim(\" \", tostring(properties.status.cause))\r\n        | extend assessmentKey = tostring(name)\r\n        | where assessmentKey == \"f738efb8-005f-680d-3d43-b3db762d6243\"",
+          "size": 0,
+          "title": "Azure AI services should restrict network access",
+          "queryType": 1,
+          "resourceType": "microsoft.resourcegraph/resources",
+          "crossComponentResources": [
+            "value::all"
+          ]
+        },
+        "name": "query - 2"
+      }
+    ],
+    "fallbackResourceIds": [
+      "Azure Security Center"
+    ],
+    "$schema": "https://github.com/Microsoft/Application-Insights-Workbooks/blob/master/schema/workbook.json"
+  }
